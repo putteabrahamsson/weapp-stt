@@ -24,6 +24,11 @@ class WeappSttModule(reactContext: ReactApplicationContext) :
     return a + b
   }
 
+  @ReactMethod
+  fun add1(a: Double, b: Double, promise: Promise) {
+    promise.resolve(a + b)
+  }
+
   companion object {
     const val NAME = "WeappStt"
   }
