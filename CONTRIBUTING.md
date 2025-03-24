@@ -48,7 +48,6 @@ yarn example ios
 ```
 
 Make sure your code passes TypeScript and ESLint. Run the following to verify:
-
 ```sh
 yarn typecheck
 yarn lint
