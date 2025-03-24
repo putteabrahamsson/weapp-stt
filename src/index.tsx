@@ -20,3 +20,7 @@ const WeappStt = NativeModules.WeappStt
 export function multiply(a: number, b: number): Promise<number> {
   return WeappStt.multiply(a, b);
 }
+
+export function add(a: number, b: number): number {
+  return WeappStt.add(a, b);
+}
