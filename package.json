@@ -1,6 +1,6 @@
 {
   "name": "weapp-stt",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "Weapp - Speech to Text",
   "source": "./src/index.tsx",
   "main": "./lib/commonjs/index.js",
