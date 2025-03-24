@@ -21,10 +21,6 @@ export function multiply(a: number, b: number): Promise<number> {
   return WeappStt.multiply(a, b);
 }
 
-export function add(a: number, b: number): number {
-  return WeappStt.add(a, b);
-}
-
 export function add1(a: number, b: number): Promise<number> {
   return WeappStt.add1(a, b);
 }

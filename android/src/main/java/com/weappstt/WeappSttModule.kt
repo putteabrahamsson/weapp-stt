@@ -20,11 +20,6 @@ class WeappSttModule(reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun add(a: Double, b: Double) {
-    return a + b
-  }
-
-  @ReactMethod
   fun add1(a: Double, b: Double, promise: Promise) {
     promise.resolve(a + b)
   }
