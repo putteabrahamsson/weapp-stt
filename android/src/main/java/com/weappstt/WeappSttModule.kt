@@ -4,12 +4,12 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.Arguments
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.weappstt.SpeechRecognizerListener
 
-class WeappSttModule(reactContext: ReactApplicationContext) :
-    ReactContextBaseJavaModule(reactContext), SpeechRecognizerListener {
-
+private val reactContext: ReactApplicationContext
+class WeappSttModule(private val reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext), SpeechRecognizerListener {
     private val speechRecognizerManager = SpeechRecognizerManager(reactContext)
 
     override fun getName(): String {
