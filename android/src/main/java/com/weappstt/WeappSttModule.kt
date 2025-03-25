@@ -4,27 +4,80 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
+import com.weappstt.SpeechRecognizerListener
+
 
 class WeappSttModule(reactContext: ReactApplicationContext) :
-  ReactContextBaseJavaModule(reactContext) {
+    ReactContextBaseJavaModule(reactContext), SpeechRecognizerListener {
 
-  override fun getName(): String {
-    return NAME
-  }
+    private val speechRecognizerManager = SpeechRecognizerManager(reactContext)
+    override fun getName(): String {
+        return NAME
+    }
 
-  // Example method
-  // See https://reactnative.dev/docs/native-modules-android
-  @ReactMethod
-  fun multiply(a: Double, b: Double, promise: Promise) {
-    promise.resolve(a * b)
-  }
+    companion object {
+        const val NAME = "WeappStt"
+    }
 
-  @ReactMethod
-  fun add1(a: Double, b: Double, promise: Promise) {
-    promise.resolve(a + b)
-  }
+    // Called when RN initializes this module
+    override fun initialize() {
+        super.initialize()
+        // Attach this module as the manager's listener
+        speechRecognizerManager.setSpeechRecognizerListener(this)
+    }
 
-  companion object {
-    const val NAME = "WeappStt"
-  }
+    // Implement the interface callbacks:
+    override fun onPartialResults(partial: String) {
+        sendEvent("onSpeechPartialResults", partial)
+    }
+
+    override fun onFinalResults(final: String) {
+        sendEvent("onSpeechResults", final)
+    }
+
+    override fun onError(errorCode: Int) {
+        sendEvent("onSpeechError", "$errorCode")
+    }
+
+    // Helper to send events to JS
+    private fun sendEvent(eventName: String, value: String) {
+        val params = Arguments.createMap()
+        params.putString("value", value)
+        reactContext
+            .getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java)
+            .emit(eventName, params)
+    }
+
+    /**
+     * Methods exposed to JavaScript
+     */
+    @ReactMethod
+    fun startListening() {
+        speechRecognizerManager.startListening()
+    }
+
+    @ReactMethod
+    fun stopListening() {
+        speechRecognizerManager.stopListening()
+    }
+
+    @ReactMethod
+    fun destroy() {
+        speechRecognizerManager.destroy()
+    }
+
+    @ReactMethod
+    fun setLanguage(language: String) {
+        speechRecognizerManager.setLanguage(language)
+    }
+
+    @ReactMethod
+    fun setTotalListeningLength(millis: Int) {
+        speechRecognizerManager.setTotalListeningLength(millis)
+    }
+
+    @ReactMethod
+    fun setListeningPauseLength(millis: Int) {
+        speechRecognizerManager.setListeningPauseLength(millis)
+    }
 }

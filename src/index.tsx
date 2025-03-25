@@ -17,10 +17,30 @@ const WeappStt = NativeModules.WeappStt
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return WeappStt.multiply(a, b);
-}
+export const startListening = (): Promise<void> => {
+  return WeappStt.startListening();
+};
 
-export function add1(a: number, b: number): Promise<number> {
-  return WeappStt.add1(a, b);
-}
+export const stopListening = (): Promise<void> => {
+  return WeappStt.stopListening();
+};
+
+export const destroy = (): Promise<void> => {
+  return WeappStt.destroy();
+};
+
+export const setLanguage = (language: string): Promise<void> => {
+  return WeappStt.setLanguage(language);
+};
+
+export const setTotalListeningLength = (
+  milliseconds: number
+): Promise<void> => {
+  return WeappStt.setTotalListeningLength(milliseconds);
+};
+
+export const setListeningPauseLength = (
+  milliseconds: number
+): Promise<void> => {
+  return WeappStt.setListeningPauseLength(milliseconds);
+};
