@@ -4,13 +4,14 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
+import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.weappstt.SpeechRecognizerListener
-
 
 class WeappSttModule(reactContext: ReactApplicationContext) :
     ReactContextBaseJavaModule(reactContext), SpeechRecognizerListener {
 
     private val speechRecognizerManager = SpeechRecognizerManager(reactContext)
+
     override fun getName(): String {
         return NAME
     }
@@ -31,11 +32,11 @@ class WeappSttModule(reactContext: ReactApplicationContext) :
         sendEvent("onSpeechPartialResults", partial)
     }
 
-    override fun onFinalResults(final: String) {
+    override fun onResults(final: String) {
         sendEvent("onSpeechResults", final)
     }
 
-    override fun onError(errorCode: Int) {
+    override fun onError(errorCode: String) {
         sendEvent("onSpeechError", "$errorCode")
     }
 

@@ -7,7 +7,7 @@ import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
 import android.util.Log
-import com.example.SpeechRecognizerListener
+import com.weappstt.SpeechRecognizerListener
 import kotlin.apply
 import kotlin.collections.forEach
 
@@ -154,3 +154,4 @@ class SpeechRecognizerManager(private val context: Context) {
         Log.d("SpeechRecognizer", "Destroying...")
         speechRecognizer?.destroy()
     }
+}
