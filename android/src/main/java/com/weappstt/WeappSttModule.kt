@@ -8,7 +8,7 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.weappstt.SpeechRecognizerListener
 
-class WeappSttModule(reactContext: ReactApplicationContext) :
+class WeappSttModule(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext), SpeechRecognizerListener {
     private val speechRecognizerManager = SpeechRecognizerManager(reactContext)
 
