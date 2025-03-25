@@ -12,7 +12,6 @@ import kotlin.apply
 import kotlin.collections.forEach
 
 class SpeechRecognizerManager(private val context: Context) {
-
     private var speechRecognizerListener: SpeechRecognizerListener? = null
 
     fun setSpeechRecognizerListener(listener: SpeechRecognizerListener) {

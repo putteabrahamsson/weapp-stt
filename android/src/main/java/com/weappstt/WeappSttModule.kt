@@ -9,7 +9,7 @@ import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.weappstt.SpeechRecognizerListener
 
 class WeappSttModule(reactContext: ReactApplicationContext) :
-  ReactContextBaseJavaModule(reactContext) {
+  ReactContextBaseJavaModule(reactContext), SpeechRecognizerListener {
     private val speechRecognizerManager = SpeechRecognizerManager(reactContext)
 
     override fun getName(): String {
