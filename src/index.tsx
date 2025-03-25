@@ -1,4 +1,11 @@
-import { NativeModules, Platform } from 'react-native';
+import {
+  DeviceEventEmitter,
+  NativeModules,
+  PermissionsAndroid,
+  Platform,
+  type PermissionStatus,
+} from 'react-native';
+import type { SpeechEventListeners } from './types';
 
 const LINKING_ERROR =
   `The package 'weapp-stt' doesn't seem to be linked. Make sure: \n\n` +
@@ -43,4 +50,22 @@ export const setListeningPauseLength = (
   milliseconds: number
 ): Promise<void> => {
   return WeappStt.setListeningPauseLength(milliseconds);
+};
+
+export const weappSTT = {
+  addListener: (
+    event: SpeechEventListeners,
+    callback: (data: string) => void
+  ) => {
+    DeviceEventEmitter.addListener(event, callback);
+  },
+  removeListeners: () => {
+    DeviceEventEmitter.removeAllListeners();
+  },
+};
+
+export const requestPermission = async (): Promise<PermissionStatus> => {
+  return await PermissionsAndroid.request(
+    PermissionsAndroid.PERMISSIONS.RECORD_AUDIO
+  );
 };
