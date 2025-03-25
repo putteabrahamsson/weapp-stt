@@ -6,7 +6,6 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.modules.core.DeviceEventManagerModule
-import com.facebook.react.uimanager.UiThreadUtil
 import com.weappstt.SpeechRecognizerListener
 
 class WeappSttModule(private val reactContext: ReactApplicationContext) :
@@ -26,8 +25,8 @@ class WeappSttModule(private val reactContext: ReactApplicationContext) :
         super.initialize()
         // Attach this module as the manager's listener
 
-        UiThreadUtil.runOnUiThread {
-            speechRecognizerManager = SpeechRecognizerManager(reactApplicationContext)
+        reactContext.runOnUiQueueThread {
+            speechRecognizerManager = SpeechRecognizerManager(reactContext)
             speechRecognizerManager.setSpeechRecognizerListener(this)
         }
     }
@@ -59,42 +58,42 @@ class WeappSttModule(private val reactContext: ReactApplicationContext) :
      */
     @ReactMethod
     fun startListening() {
-        UiThreadUtil.runOnUiThread {
+        reactContext.runOnUiQueueThread {
             speechRecognizerManager.startListening()
         }
     }
 
     @ReactMethod
     fun stopListening() {
-        UiThreadUtil.runOnUiThread {
+        reactContext.runOnUiQueueThread {
             speechRecognizerManager.stopListening()
         }
     }
 
     @ReactMethod
     fun destroy() {
-        UiThreadUtil.runOnUiThread {
+        reactContext.runOnUiQueueThread {
             speechRecognizerManager.destroy()
         }
     }
 
     @ReactMethod
     fun setLanguage(language: String) {
-        UiThreadUtil.runOnUiThread {
+        reactContext.runOnUiQueueThread {
             speechRecognizerManager.setLanguage(language)
         }
     }
 
     @ReactMethod
     fun setTotalListeningLength(millis: Int) {
-        UiThreadUtil.runOnUiThread {
+        reactContext.runOnUiQueueThread {
             speechRecognizerManager.setTotalListeningLength(millis)
         }
     }
 
     @ReactMethod
     fun setListeningPauseLength(millis: Int) {
-        UiThreadUtil.runOnUiThread {
+        reactContext.runOnUiQueueThread {
             speechRecognizerManager.setListeningPauseLength(millis)
         }
     }
