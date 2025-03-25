@@ -6,11 +6,12 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.modules.core.DeviceEventManagerModule
+import com.facebook.react.uimanager.UiThreadUtil
 import com.weappstt.SpeechRecognizerListener
 
 class WeappSttModule(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext), SpeechRecognizerListener {
-    private val speechRecognizerManager = SpeechRecognizerManager(reactContext)
+    private lateinit var speechRecognizerManager: SpeechRecognizerManager
 
     override fun getName(): String {
         return NAME
@@ -24,7 +25,11 @@ class WeappSttModule(private val reactContext: ReactApplicationContext) :
     override fun initialize() {
         super.initialize()
         // Attach this module as the manager's listener
-        speechRecognizerManager.setSpeechRecognizerListener(this)
+
+        UiThreadUtil.runOnUiThread {
+            speechRecognizerManager = SpeechRecognizerManager(reactApplicationContext)
+            speechRecognizerManager.setSpeechRecognizerListener(this)
+        }
     }
 
     // Implement the interface callbacks:
@@ -54,31 +59,43 @@ class WeappSttModule(private val reactContext: ReactApplicationContext) :
      */
     @ReactMethod
     fun startListening() {
-        speechRecognizerManager.startListening()
+        UiThreadUtil.runOnUiThread {
+            speechRecognizerManager.startListening()
+        }
     }
 
     @ReactMethod
     fun stopListening() {
-        speechRecognizerManager.stopListening()
+        UiThreadUtil.runOnUiThread {
+            speechRecognizerManager.stopListening()
+        }
     }
 
     @ReactMethod
     fun destroy() {
-        speechRecognizerManager.destroy()
+        UiThreadUtil.runOnUiThread {
+            speechRecognizerManager.destroy()
+        }
     }
 
     @ReactMethod
     fun setLanguage(language: String) {
-        speechRecognizerManager.setLanguage(language)
+        UiThreadUtil.runOnUiThread {
+            speechRecognizerManager.setLanguage(language)
+        }
     }
 
     @ReactMethod
     fun setTotalListeningLength(millis: Int) {
-        speechRecognizerManager.setTotalListeningLength(millis)
+        UiThreadUtil.runOnUiThread {
+            speechRecognizerManager.setTotalListeningLength(millis)
+        }
     }
 
     @ReactMethod
     fun setListeningPauseLength(millis: Int) {
-        speechRecognizerManager.setListeningPauseLength(millis)
+        UiThreadUtil.runOnUiThread {
+            speechRecognizerManager.setListeningPauseLength(millis)
+        }
     }
 }
