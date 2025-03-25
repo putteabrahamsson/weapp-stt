@@ -55,7 +55,7 @@ export const setListeningPauseLength = (
 export const weappSTT = {
   addListener: (
     event: SpeechEventListeners,
-    callback: (data: string) => void
+    callback: (data: { value: string }) => void
   ) => {
     DeviceEventEmitter.addListener(event, callback);
   },
