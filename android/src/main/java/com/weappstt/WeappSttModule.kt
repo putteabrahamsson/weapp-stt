@@ -8,8 +8,13 @@ import com.facebook.react.bridge.Arguments
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.weappstt.SpeechRecognizerListener
 
+/**
+ * Module to expose to RN
+ *
+ * Ensure that destroy is called when SpeechRecognizer is no longer needed, to clean up resources.
+ */
 class WeappSttModule(private val reactContext: ReactApplicationContext) :
-  ReactContextBaseJavaModule(reactContext), SpeechRecognizerListener {
+    ReactContextBaseJavaModule(reactContext), SpeechRecognizerListener {
     private lateinit var speechRecognizerManager: SpeechRecognizerManager
 
     override fun getName(): String {
@@ -31,11 +36,32 @@ class WeappSttModule(private val reactContext: ReactApplicationContext) :
         }
     }
 
-    // Implement the interface callbacks:
+    /**
+     * Checks if the speech recognizer service is available on the user's device.
+     * This can be seen as the first thing to do before starting to listen.
+     */
+    override fun onAvailable(isAvailable: Boolean) {
+        sendEvent("onSpeechAvailable", "$isAvailable")
+    }
+
+    /**
+     * Callback delivering partial speech recognition results
+     *
+     * Use this function as the primary way to fetch words and the full text by concatenating the results.
+     */
     override fun onPartialResults(partial: String) {
         sendEvent("onSpeechPartialResults", partial)
     }
 
+    /**
+     * Callback delivering the final speech recognition result
+     * ONLY if setListeningPauseLength or setTotalListeningLength are set to Android default values.
+     *
+     * This library sets non-default values which means that onResults will return null.
+     * Until this bug is resolved, use onPartialResults instead to fetch words.
+     *
+     * See: https://issuetracker.google.com/issues/227926004
+     */
     override fun onResults(final: String) {
         sendEvent("onSpeechResults", final)
     }
@@ -44,7 +70,9 @@ class WeappSttModule(private val reactContext: ReactApplicationContext) :
         sendEvent("onSpeechError", "$errorCode")
     }
 
-    // Helper to send events to JS
+    /**
+     * Helper to send events to RN
+     */
     private fun sendEvent(eventName: String, value: String) {
         val params = Arguments.createMap()
         params.putString("value", value)
@@ -54,7 +82,7 @@ class WeappSttModule(private val reactContext: ReactApplicationContext) :
     }
 
     /**
-     * Methods exposed to JavaScript
+     * Functions exposed to RN
      */
     @ReactMethod
     fun startListening() {
@@ -70,6 +98,10 @@ class WeappSttModule(private val reactContext: ReactApplicationContext) :
         }
     }
 
+    /**
+     * Call on this function when the SpeechRecognizer is no longer used, to release resources.
+     * After calling destroy, you must reinitialize if you want to recognize speech again.
+     **/
     @ReactMethod
     fun destroy() {
         reactContext.runOnUiQueueThread {

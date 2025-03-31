@@ -64,6 +64,10 @@ export const weappSTT = {
   },
 };
 
+export const isAvailable = async () => {
+  return await WeappStt.isAvailable();
+};
+
 export const requestPermission = async (): Promise<PermissionStatus> => {
   return await PermissionsAndroid.request(
     PermissionsAndroid.PERMISSIONS.RECORD_AUDIO

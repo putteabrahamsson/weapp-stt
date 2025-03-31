@@ -12,11 +12,6 @@ import kotlin.apply
 import kotlin.collections.forEach
 
 class SpeechRecognizerManager(private val context: Context) {
-    private var speechRecognizerListener: SpeechRecognizerListener? = null
-
-    fun setSpeechRecognizerListener(listener: SpeechRecognizerListener) {
-        this.speechRecognizerListener = listener
-    }
 
     // Default language
     private val swedishLanguage = "sv-SE"
@@ -28,73 +23,73 @@ class SpeechRecognizerManager(private val context: Context) {
         putExtra(RecognizerIntent.EXTRA_SPEECH_INPUT_MINIMUM_LENGTH_MILLIS, 60000)
     }
 
-    private var partialTranscript = ""
+    private var speechRecognizer: SpeechRecognizer? = null
+    private var speechRecognizerListener: SpeechRecognizerListener? = null
 
-    // Initialize SpeechRecognizer if available.
-    private val speechRecognizer: SpeechRecognizer? =
-        if (SpeechRecognizer.isRecognitionAvailable(context)) {
-            SpeechRecognizer.createSpeechRecognizer(context)
+    fun setSpeechRecognizerListener(listener: SpeechRecognizerListener) {
+        this.speechRecognizerListener = listener
+
+        val isAvailable = SpeechRecognizer.isRecognitionAvailable(context)
+        if (isAvailable) {
+
+            // Create and setup SpeechRecognizer
+            speechRecognizer = SpeechRecognizer.createSpeechRecognizer(context).also {
+                it.setRecognitionListener(object : RecognitionListener {
+                    override fun onReadyForSpeech(bundle: Bundle?) {
+                        Log.d("SpeechRecognizer", "Ready for speech")
+                    }
+
+                    override fun onBeginningOfSpeech() {
+                        Log.d("SpeechRecognizer", "onBeginningOfSpeech")
+                    }
+
+                    override fun onRmsChanged(rmsdB: Float) {
+                        // Optional: handle RMS changes for visual feedback.
+                    }
+
+                    override fun onBufferReceived(buffer: ByteArray?) {}
+
+                    override fun onEndOfSpeech() {
+                        Log.d("SpeechRecognizer", "onEndOfSpeech")
+                    }
+
+                    override fun onError(error: Int) {
+                        Log.e("SpeechRecognizer", "onError: $error")
+                        val errorMessage = handleErrorCode(error)
+                        speechRecognizerListener?.onError("$errorMessage Error code: $error")
+                    }
+
+                    /**
+                     * If non-default settings are used onResults will return null, use onPartialResults instead to fetch words.
+                     * Refer to this: https://issuetracker.google.com/issues/227926004
+                     */
+                    override fun onResults(results: Bundle?) {
+                        val data = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                        Log.d("SpeechRecognizer", "Results: $data")
+                        speechRecognizerListener?.onResults(data.toString())
+                    }
+
+                    /**
+                     * Use if setListeningPauseLength or setTotalListeningLength are used.
+                     */
+                    override fun onPartialResults(partialResults: Bundle?) {
+                        val partialData =
+                            partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
+                        partialData?.forEach { word ->
+                            Log.d("SpeechRecognizer", "Partial: $word")
+                            speechRecognizerListener?.onPartialResults("$word ")
+                        }
+                    }
+
+                    override fun onEvent(eventType: Int, params: Bundle?) {}
+                })
+            }
+            Log.d("SpeechRecognizer", "Speech recognition service available")
+            speechRecognizerListener?.onAvailable(true)
         } else {
             Log.e("SpeechRecognizer", "Speech recognition service NOT available")
-            speechRecognizerListener?.onError("Speech recognition service NOT available")
-            null
+            speechRecognizerListener?.onAvailable(false)
         }
-
-    init {
-        speechRecognizer?.setRecognitionListener(object : RecognitionListener {
-            override fun onReadyForSpeech(bundle: Bundle?) {
-                Log.d("SpeechRecognizer", "Ready for speech")
-                // Ensures a clean transcript when starting.
-                partialTranscript = ""
-            }
-
-            override fun onBeginningOfSpeech() {
-                Log.d("SpeechRecognizer", "onBeginningOfSpeech")
-            }
-
-            override fun onRmsChanged(rmsdB: Float) {
-                // Optional: handle RMS changes for visual feedback.
-            }
-
-            override fun onBufferReceived(buffer: ByteArray?) {}
-
-            override fun onEndOfSpeech() {
-                Log.d("SpeechRecognizer", "onEndOfSpeech")
-            }
-
-            override fun onError(error: Int) {
-                Log.e("SpeechRecognizer", "onError: $error")
-                val errorMessage = handleErrorCode(error)
-                speechRecognizerListener?.onError("$errorMessage Error code: $error")
-            }
-
-            /**
-             * If non-default settings are used onResults will return null, use onPartialResults instead to fetch words.
-             * Refer to this: https://issuetracker.google.com/issues/227926004
-             */
-            override fun onResults(results: Bundle?) {
-                val data = results?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                Log.d("SpeechRecognizer", "Results: $data")
-
-                speechRecognizerListener?.onResults(data.toString())
-            }
-
-            /**
-             * Use if setListeningPauseLength or setTotalListeningLength are used.
-             */
-            override fun onPartialResults(partialResults: Bundle?) {
-                val partialData =
-                    partialResults?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
-                partialData?.forEach { word ->
-                    Log.d("SpeechRecognizer", "Partial: $word")
-                    partialTranscript += "$word "
-                    speechRecognizerListener?.onPartialResults("$word ")
-                }
-                // Optionally, notify a listener or update an observable property.
-            }
-
-            override fun onEvent(eventType: Int, params: Bundle?) {}
-        })
     }
 
     private fun handleErrorCode(error: Int): String {
@@ -152,5 +147,7 @@ class SpeechRecognizerManager(private val context: Context) {
     fun destroy() {
         Log.d("SpeechRecognizer", "Destroying...")
         speechRecognizer?.destroy()
+        speechRecognizer = null
+        speechRecognizerListener = null
     }
 }

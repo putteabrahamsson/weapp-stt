@@ -1,4 +1,5 @@
 export type SpeechEventListeners =
   | 'onSpeechPartialResults'
   | 'onSpeechResults'
-  | 'onSpeechError';
+  | 'onSpeechError'
+  | 'onAvailable';
